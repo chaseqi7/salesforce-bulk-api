@@ -32,12 +32,13 @@ NAMESPACE = 'http://www.force.com/2009/06/asyncapi/dataload'
 
 def salesforce_session():
     """Returns an authenticated simple_salesforce.Salesforce instance."""
+    print os.environ.get('SALESFORCE_SANDBOX') == 'True'
     return Salesforce(username=os.environ['SALESFORCE_USERNAME'],
                       password=os.environ['SALESFORCE_PASSWORD'],
                       security_token=os.environ['SALESFORCE_SECURITY_TOKEN'],
                       instance=os.environ['SALESFORCE_INSTANCE'],
                       sandbox=os.environ.get('SALESFORCE_SANDBOX') == 'True',
-                      sf_version='34.0')
+                      version='37.0')
 
 
 class SalesforceBulkJob:
@@ -55,8 +56,11 @@ class SalesforceBulkJob:
         self.session_id = salesforce.session_id
         self.async_url = (salesforce.base_url
                                     .replace('/data/', '/async/')
-                                    .replace('v' + salesforce.sf_version,
-                                             salesforce.sf_version))
+                                    .replace('v' + str(salesforce.sf_version),
+                                             str(salesforce.sf_version)))
+        #print str(salesforce.version)
+        #print salesforce.base_url
+        #print self.async_url
 
         assert operation in self.SUPPORTED_OPERATIONS, '{} is not a valid bulk operation.'.format(operation)
         self.operation = operation
